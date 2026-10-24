@@ -38,22 +38,19 @@
 
   </div>
     
+<div class="rgb-mode">
 
   <div class="rgb-control">
-
-    
-    
-      <label for="rgb">RGB</label>
-      <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
-      <span id="rgb-preview" class="rgb-preview"></span>
-    
-    <script src="RGB-slider.js"></script>
-
-    <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
-
-    
+    <label for="rgb">RGB</label>
+    <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
+    <span id="rgb-preview" class="rgb-preview"></span>
   </div>
 
+  <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+
+</div>
+
+<script src="RGB-slider.js"></script>
 
 
   <script src="main.js"></script>
