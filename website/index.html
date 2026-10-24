@@ -5,15 +5,51 @@
   <title>Website</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+
   <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
-  <h1>Control Panel</h1>
+
+  <button class="round-button percentage" onclick="sendMQTT('Percentage')">Percentage</button>
+
+  <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
+
+  <div class="button-container">
+
+  <button class="capmodel" onclick="sendMQTT('Cap model')">Cap model</button>
   <p>Status: <span id="status">Connecting to broker...</span></p>
 
-  <button class="btn btn-on" onclick="sendMQTT('ON')">Turn ON</button>
-  <button class="btn btn-off" onclick="sendMQTT('OFF')">Turn OFF</button>
+
+  <div class="button-container">
+
+  
+      <div class="rgb-control">
+        <label for="rgb">RGB</label>
+        <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
+        <span id="rgb-preview" class="rgb-preview"></span>
+
+        <script>
+        const slider = document.getElementById("rgb");
+        const preview = document.getElementById("rgb-preview");
+
+        slider.addEventListener("input", () => {
+          const color = `hsl(${slider.value}, 100%, 50%)`;
+          preview.style.backgroundColor = color;
+
+          // TODO: send the value to your device here, e.g.
+          // sendColor(slider.value);
+        });
+      </script>
+
+
+
+
+  <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+
+
+
 
   <script src="main.js"></script>
 </body>

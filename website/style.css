@@ -1,24 +1,111 @@
 body {
-  font-family: Arial;
+  font-family: "Comic Sans MS", "Comic Neue", cursive, sans-serif;
   text-align: center;
   margin-top: 50px;
   background-color: #f4f4f9;
 }
 
-.btn {
-  padding: 15px 25px;
-  font-size: 18px;
-  cursor: pointer;
+.round-button {
+  box-sizing: border-box;
+  width: 120px;
+  height: 120px;
   border: none;
-  border-radius: 5px;
+  border-radius: 50%;
+  margin: 5px 50px 50px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: white;
-  margin: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, filter 0.2s;
 }
 
-.btn-on {
-  background-color: #4CAF50;
+.round-button:hover  { filter: brightness(1.3); }
+.round-button:active { transform: scale(0.95); }
+
+.percentage { background-color: rgb(255, 82, 82); }
+.hydration  { background-color: #2196F3; }
+.mode { background-color: rgb(249, 121, 1); }
+
+
+.capmodel  { 
+  background-color: rgb(49, 87, 72); 
+  box-sizing: border-box;
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 50%;
+  margin: 5px 50px 50px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, filter 0.2s;
 }
 
-.btn-off {
-  background-color: #f44336;
+
+
+.rgb-control {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 5px 50px 50px;
+  font-weight: bold;
 }
+
+.rgb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 220px;
+  height: 16px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(to right,
+    red, yellow, lime, cyan, blue, magenta, red);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Thumb (Chrome, Safari, Edge) */
+.rgb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Thumb (Firefox) */
+.rgb-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.rgb-slider:active::-webkit-slider-thumb { transform: scale(0.9); }
+
+.rgb-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: hsl(0, 100%, 50%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
