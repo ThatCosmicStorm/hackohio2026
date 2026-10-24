@@ -11,43 +11,48 @@
 </head>
 
 <body>
-
-  <button class="round-button percentage" onclick="sendMQTT('Percentage')">Percentage</button>
-
-  <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
-
-  <div class="button-container">
-
-  <button class="capmodel" onclick="sendMQTT('Cap model')">Cap model</button>
-  <p>Status: <span id="status">Connecting to broker...</span></p>
-
-
-  <div class="button-container">
-
   
-      <div class="rgb-control">
-        <label for="rgb">RGB</label>
-        <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
-        <span id="rgb-preview" class="rgb-preview"></span>
 
-        <script>
-        const slider = document.getElementById("rgb");
-        const preview = document.getElementById("rgb-preview");
+  <div class="percentage-hydration">
+    <button class="round-button percentage" onclick="sendMQTT('Percentage')">Percentage</button>
 
-        slider.addEventListener("input", () => {
-          const color = `hsl(${slider.value}, 100%, 50%)`;
-          preview.style.backgroundColor = color;
+    <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
+  </div>
 
-          // TODO: send the value to your device here, e.g.
-          // sendColor(slider.value);
-        });
-      </script>
+  <div>
+    
+    <script type="module"
+  src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
+<model-viewer
+  center
+  src="Bottle1.glb"
+  alt="3D model of the bottle"
+  camera-controls
+  auto-rotate
+  shadow-intensity="1"
+  style="width: 300px; height: 300px;">
+</model-viewer>
 
+    <p>Status: <span id="status">Connecting to broker...</span></p>
 
+  </div>
+    
 
-  <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+  <div class="rgb-control">
 
+    
+    
+      <label for="rgb">RGB</label>
+      <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
+      <span id="rgb-preview" class="rgb-preview"></span>
+    
+    <script src="RGB-slider.js"></script>
+
+    <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+
+    
+  </div>
 
 
 
