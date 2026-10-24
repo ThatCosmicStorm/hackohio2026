@@ -24,7 +24,17 @@ GREEN: tuple[int, int, int] = (0, 255, 0)
 PURPLE: tuple[int, int, int] = (255, 0, 255)
 
 rgb_led: NeoPixel = NeoPixel(Pin(48), 1)
-uv_led: Pin = Pin(2, Pin.OUT)
+uv_led: Pin = Pin(5, Pin.OUT)
+
+
+def toggle_pin(pin: Pin) -> None:
+    """*Toggle specific pin on ESP32*.
+
+    Args:
+        pin (Pin): *Numbered pin*
+
+    """
+    pin.value(not pin.value())
 
 
 def set_rgb_led(
@@ -65,16 +75,16 @@ def connect_wifi(ssid: str, password: str) -> None:
 
     """
     wlan: network.WLAN = network.WLAN(network.STA_IF)
-    wlan.active(WIFI_ON)
+    wlan.active(WIFI_OFF)
     sleep(0.1)
     wlan.active(WIFI_ON)
     sleep(0.1)
     print("Connecting...")
-    set_rgb_led(RED, seconds=1.0)
+    set_rgb_led(RED, seconds=2.0)
     wlan.connect(ssid, password)
     sleep(5)
     print("Connected! IP:", wlan.ifconfig()[0])
-    set_rgb_led(GREEN, seconds=1.0)
+    set_rgb_led(GREEN, seconds=2.0)
 
 
 def disconnect_wifi() -> None:
@@ -105,6 +115,8 @@ def msg_to_cmd(topic: bytes, msg: bytes) -> None:
     elif msg == b"OFF":
         uv_led.off()
         print("LED: Off")
+    elif msg == b"filler":
+        toggle_pin(uv_led)
 
 
 def main() -> None:
