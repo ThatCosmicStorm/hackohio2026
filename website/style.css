@@ -2,7 +2,7 @@ body {
   font-family: "Comic Sans MS", "Comic Neue", cursive, sans-serif;
   text-align: center;
   margin-top: 50px;
-  background-color: #4d4d4d;
+  background-color: #3d3d3d;
 }
 
 .round-button {
@@ -29,12 +29,12 @@ body {
 .round-button:active { transform: scale(0.95); }
 
 .percentage { background-color: rgb(37, 37, 37); 
-border: 2px solid rgb(96, 6, 101);
+border: 2px solid rgb(146, 55, 171);
 }
 .hydration  { background-color: rgb(37, 37, 37); 
-border: 2px solid rgb(96, 6, 101);
+border: 2px solid rgb(146, 55, 171);
 }
-.mode { background-color: rgb(96, 6, 101); }
+.mode { background-color: rgb(146, 55, 171); }
 
 
 .capmodel  { 
