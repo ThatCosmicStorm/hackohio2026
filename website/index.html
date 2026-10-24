@@ -11,10 +11,17 @@
 <body>
   <div class="Battery-hydration">
 
-
-
     <button class="round-button percentage" onclick="sendMQTT('Percentage')">Percentage</button>
+
+    <div class="progress-ring" data-topic="bottle/battery" style="--pct: 0;">
+      <button class="round-button percentage" onclick="sendMQTT('Percentage')">--%</button>
+    </div>
+    
     <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
+    <div class="progress-ring" data-topic="bottle/hydration" style="--pct: 0;">
+      <button class="round-button hydration" onclick="sendMQTT('Hydration')">--%</button>
+    </div>
+
   </div>
 
   <div>

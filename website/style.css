@@ -134,71 +134,46 @@ model-viewer {
 }
 
 
-/* Apply css properties to h1 element */
-        h1 {
-            text-align: center;
-        }
-
-        /* Create a container using CSS properties */
-        .container {
-            top: 30%;
-            left: 50%;
-            position: absolute;
-            text-align: center;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Apply CSS properties to ui-widgets class */
-        .ui-widgets {
-            position: relative;
-            display: inline-block;
-            width: 10rem;
-            height: 10rem;
-            border-radius: 9rem;
-            margin: 1.5rem;
-            border: 1.2rem solid palegreen;
-            box-shadow: inset 0 0 7px grey;
-            border-left-color: palegreen;
-            border-top-color: chartreuse;
-            border-right-color: darkgreen;
-            border-bottom-color: white;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        /*  Apply css properties to the second 
-            child of ui-widgets class */
-        .ui-widgets:nth-child(2) {
-            border-top-color: chartreuse;
-            border-right-color: white;
-            border-left-color: palegreen;
-            border-bottom-color: white;
-        }
-
-        /*  Apply css properties to ui-widgets class 
-            and ui-values class*/
-        .ui-widgets .ui-values {
-            top: 40px;
-            position: absolute;
-            left: 10px;
-            right: 0;
-            font-weight: 700;
-            font-size: 2.0rem;
-
-        }
-
-        /*  Apply css properties to ui-widgets 
-            class and ui-labels class*/
-        .ui-widgets .ui-labels {
-
-            left: 0;
-            bottom: -16px;
-            text-shadow: 0 0 4px grey;
-            color: black;
-            position: absolute;
-            width: 100%;
-            font-size: 16px;
-        }
 
 
 
+@property --pct {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.progress-ring {
+  --button-size: 120px;
+  --thickness: 10px;
+  --fill: #4caf50;
+  --track: #dcdce6;
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: calc(var(--button-size) + 2 * var(--thickness));
+  height: calc(var(--button-size) + 2 * var(--thickness));
+  transition: --pct 0.6s ease;        /* smooth animation on each update */
+}
+
+/* The ring layer, sitting behind the button */
+.progress-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--fill) calc(var(--pct) * 1%), var(--track) 0);
+}
+
+/* Button sits on top and covers the middle of the ring */
+.progress-ring .round-button {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  box-sizing: border-box;
+  width: var(--button-size);
+  height: var(--button-size);
+  padding: 0;
+}
