@@ -1,83 +1,119 @@
+# ruff: ignore[CPY001]
+"""*Main Python script*."""
 
-import time
-from machine import Pin
+from time import sleep
+
 import network
-import neopixel
+from machine import Pin
+from neopixel import NeoPixel
 from umqtt.simple import MQTTClient
 
-SUR_SSID = "iPhone (2)"
-SUR_PASSWORD = "SurIsTheBest"
+R2_SSID: str = "Adams County Mosque"
+R2_KEY: str = "allahuakbar777"
 
-R2_SSID = "Adams County Mosque"
-R2_PASSWORD = "allahuakbar777"
+MQTT_CLIENT_ID: str = "esp32s3_client_hackohio2026"
+MQTT_SERVER: str = "broker.hivemq.com"
+MQTT_TOPIC: str = "myhome/esp32s3/led"
 
-MQTT_CLIENT_ID = "esp32s3_client_hackohio2026"
-MQTT_SERVER = "broker.hivemq.com"
-MQTT_TOPIC = "myhome/esp32s3/led"
+WIFI_ON: bool = True
+WIFI_OFF: bool = False
 
+RGB_OFF: tuple[int, int, int] = (0, 0, 0)
+RED: tuple[int, int, int] = (255, 0, 0)
+GREEN: tuple[int, int, int] = (0, 255, 0)
+PURPLE: tuple[int, int, int] = (255, 0, 255)
 
-np = neopixel.NeoPixel(Pin(48), 1)
-
-
-def blink(r: int, g: int, b: int):
-    np[0] = (r, g, b)
-    np.write()
-    time.sleep(1)
-    np[0] = (0, 0, 0)
-    np.write()
+rgb_led: NeoPixel = NeoPixel(Pin(48), 1)
+uv_led: Pin = Pin(2, Pin.OUT)
 
 
-def connect_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(False)
-    time.sleep(0.1)
-    wlan.active(True)
-    time.sleep(0.1)
-    wlan.config(pm=wlan.PM_NONE)
-    time.sleep(0.1)
+def set_rgb_led(
+    color: tuple[int, int, int],
+    seconds: float = 0,
+    pulse: int = 0,
+) -> None:
+    """*Set ESP32 RGB LED to a certain color*.
 
+    Args:
+        color (tuple[int, int, int]): *Specified color*
+        seconds (float, optional): *Turn off after waiting*. Defaults to 0.
+        pulse (int, optional): *# of pulses*. Defaults to 0.
+
+    """
+    if not seconds:
+        rgb_led[0] = color
+        rgb_led.write()
+    elif not pulse:
+        sleep(seconds)
+        rgb_led[0] = RGB_OFF
+        rgb_led.write()
+    for _ in range(pulse):
+        rgb_led[0] = color
+        rgb_led.write()
+        sleep(seconds)
+        rgb_led[0] = RGB_OFF
+        rgb_led.write()
+        sleep(seconds)
+
+
+def connect_wifi(ssid: str, password: str) -> None:
+    """*Connect ESP32 to a specified Wi-Fi network*.
+
+    Args:
+        ssid (str): *SSID*
+        password (str): *Password*
+
+    """
+    wlan: network.WLAN = network.WLAN(network.STA_IF)
+    wlan.active(WIFI_ON)
+    sleep(0.1)
+    wlan.active(WIFI_ON)
+    sleep(0.1)
+    print("Connecting...")
+    set_rgb_led(RED, seconds=1.0)
+    wlan.connect(ssid, password)
+    sleep(5)
+    print("Connected! IP:", wlan.ifconfig()[0])
+    set_rgb_led(GREEN, seconds=1.0)
+
+
+def disconnect_wifi() -> None:
+    """*Disconnect ESP32 from current Wi-Fi network*."""
+    wlan: network.WLAN = network.WLAN(network.STA_IF)
     if wlan.isconnected():
+        print("Disconnecting...")
+        set_rgb_led(RED, seconds=0.1, pulse=5)
         wlan.disconnect()
-        print("Was connected, now disconnected")
-
-    print("Connecting to Wi-Fi...")
-    time.sleep(0.1)
-    blink(50, 0, 0)
-
-    wlan.connect(R2_SSID, R2_PASSWORD)
-    time.sleep(1)
-
-    print("Connected to Wi-Fi! IP:", wlan.ifconfig()[0])
-    blink(0, 50, 0)
-
-
-def disconnect_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    if wlan.isconnected():
-        print("Disconnecting from Wi-Fi...")
-        blink(0, 50, 0)
-        wlan.disconnect()
-        wlan.active(False)
-        print("Disconnected")
+        wlan.active(WIFI_OFF)
+        print("Disconnected!")
     else:
         print("Wi-Fi was not connected.")
 
 
-def sub_cb(topic, msg):
+def msg_to_cmd(topic: bytes, msg: bytes) -> None:
+    """*Use website message to command ESP32*.
+
+    Args:
+        topic (bytes): *Received topic*
+        msg (bytes): *Topic message*
+
+    """
     print(f"Received message on {topic.decode()}: {msg.decode()}")
     if msg == b"ON":
-        blink(255, 255, 255)
-        print("LED turned ON")
+        uv_led.on()
+        print("LED: On")
     elif msg == b"OFF":
-        blink(0, 0, 0)
-        print("LED turned OFF")
+        uv_led.off()
+        print("LED: Off")
 
 
-def main():
-    connect_wifi()
+def main() -> None:
+    """*Control ESP32*."""
+    uv_led.off()
+    connect_wifi(R2_SSID, R2_KEY)
 
-    client = MQTTClient(MQTT_CLIENT_ID, MQTT_SERVER)
-    client.set_callback(sub_cb)
+    client: MQTTClient = MQTTClient(MQTT_CLIENT_ID, MQTT_SERVER)
+    client.set_callback(msg_to_cmd)
     client.connect()
     client.subscribe(MQTT_TOPIC)
     print(f"Connected to MQTT broker and subscribed to {MQTT_TOPIC}")
@@ -85,15 +121,12 @@ def main():
     try:
         while True:
             client.check_msg()
-            time.sleep(.1)
-    except Exception as e:
-        print("Error:", e)
+            sleep(0.1)
+    except KeyboardInterrupt:
         client.disconnect()
     finally:
         disconnect_wifi()
 
 
 if __name__ == "__main__":
-    connect_wifi()
-    time.sleep(5)
-    disconnect_wifi()
+    main()
