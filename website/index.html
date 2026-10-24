@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+  <style src="style.css"></style>
+</head>
+
+<body>
+  <h1>Control Panel</h1>
+  <p>Status: <span id="status">Connecting to broker...</span></p>
+
+  <button class="btn btn-on" onclick="sendMQTT('ON')">Turn ON</button>
+  <button class="btn btn-off" onclick="sendMQTT('OFF')">Turn OFF</button>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
