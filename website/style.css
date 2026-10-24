@@ -29,10 +29,10 @@ body {
 .round-button:active { transform: scale(0.95); }
 
 .percentage { background-color: rgb(37, 37, 37); 
-border: 2px solid rgb(146, 55, 171);
+border: 8px solid rgb(146, 55, 171);
 }
 .hydration  { background-color: rgb(37, 37, 37); 
-border: 2px solid rgb(146, 55, 171);
+border: 8px solid rgb(146, 55, 171);
 }
 .mode { background-color: rgb(146, 55, 171); }
 
@@ -114,7 +114,7 @@ border: 2px solid rgb(146, 55, 171);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.percentage-hydration, .rgb-mode {
+.Battery-hydration, .rgb-mode {
   display: flex;
   justify-content: center;
   gap: 20px;

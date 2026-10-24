@@ -17,3 +17,4 @@ function sendMQTT(command) {
     client.publish(topic, command);
     console.log('Sent command: ' + command);
 }
+
