@@ -2,7 +2,7 @@ body {
   font-family: "Comic Sans MS", "Comic Neue", cursive, sans-serif;
   text-align: center;
   margin-top: 50px;
-  background-color: #00556e;
+  background-color: #4d4d4d;
 }
 
 .round-button {
@@ -28,9 +28,13 @@ body {
 .round-button:hover  { filter: brightness(1.3); }
 .round-button:active { transform: scale(0.95); }
 
-.percentage { background-color: rgb(255, 82, 82); }
-.hydration  { background-color: #2196F3; }
-.mode { background-color: rgb(249, 121, 1); }
+.percentage { background-color: rgb(37, 37, 37); 
+border: 2px solid rgb(96, 6, 101);
+}
+.hydration  { background-color: rgb(37, 37, 37); 
+border: 2px solid rgb(96, 6, 101);
+}
+.mode { background-color: rgb(96, 6, 101); }
 
 
 .capmodel  { 
@@ -63,6 +67,7 @@ body {
   gap: 12px;
   margin: 5px 50px 50px;
   font-weight: bold;
+  color: white;
 }
 
 .rgb-slider {
