@@ -5,54 +5,34 @@
   <title>Website</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
-
   <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
-  
-
   <div class="Battery-hydration">
     <button class="round-button percentage" onclick="sendMQTT('Percentage')">Percentage</button>
-
     <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
   </div>
 
   <div>
-    
-    <script type="module"
-  src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-<model-viewer
-  center
-  src="Bottle1.glb"
-  alt="3D model of the bottle"
-  camera-controls
-  auto-rotate
-  shadow-intensity="1"
-  style="width: 300px; height: 300px;">
-</model-viewer>
-
-    <p>Status: <span id="status">Connecting to broker...</span></p>
-
-  </div>
-    
-<div class="rgb-mode">
-
-  <div class="rgb-control">
-    <label for="rgb">RGB</label>
-    <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
-    <span id="rgb-preview" class="rgb-preview"></span>
+    <model-viewer center src="Bottle1.glb" alt="3D model of the bottle" camera-controls auto-rotate shadow-intensity="1"
+      style="width: 300px; height: 300px;">
+    </model-viewer>
   </div>
 
-  <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+  <div class="rgb-mode">
+    <div class="rgb-control">
+      <label for="rgb">RGB</label>
+      <input type="range" id="rgb" class="rgb-slider" min="0" max="360" value="0">
+      <span id="rgb-preview" class="rgb-preview"></span>
+    </div>
 
-</div>
+    <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+  </div>
 
-<script src="RGB-slider.js"></script>
-
-
+  <script src="RGB-slider.js"></script>
   <script src="main.js"></script>
 </body>
 

@@ -50,6 +50,8 @@ def set_rgb_led(
         pulse (int, optional): *# of pulses*. Defaults to 0.
 
     """
+    rgb_led[0] = RGB_OFF
+    rgb_led.write()
     if not seconds:
         rgb_led[0] = color
         rgb_led.write()
@@ -82,7 +84,7 @@ def connect_wifi(ssid: str, password: str) -> None:
     print("Connecting...")
     set_rgb_led(RED, seconds=2.0)
     wlan.connect(ssid, password)
-    sleep(5)
+    sleep(1)
     print("Connected! IP:", wlan.ifconfig()[0])
     set_rgb_led(GREEN, seconds=2.0)
 
