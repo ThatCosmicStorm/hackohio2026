@@ -13,8 +13,8 @@ from vl53l0x import VL53L0X
 CLEAR_TERMINAL: str = "\033[2J\033[H"
 
 HOTSPOT: dict[str, str] = {
-    "ssid": "iPhone (2)",
-    "key": "SurIsTheBest",
+    "ssid": "Adams County Mosque",
+    "key": "allahuakbar777",
 }
 
 MQTT: dict[str, str] = {
@@ -45,21 +45,21 @@ PIN: dict[str, int] = {
 }
 
 
-rgb_led: NeoPixel = NeoPixel(Pin(PIN["rgb"]), 1)
-uv_led: Pin = Pin(PIN["uv"], mode=Pin.OUT)
-distance: VL53L0X = VL53L0X(
-    I2C(
-        0,
-        scl=Pin(PIN["dist_clock"]),
-        sda=Pin(PIN["dist_data"]),
-        freq=100_000,
-    ),
-)
+# rgb_led: NeoPixel = NeoPixel(Pin(PIN["rgb"]), 1)
+uv_led: Pin = Pin(PIN["uv"], Pin.OUT)
+# distance: VL53L0X = VL53L0X(
+#     I2C(
+#         0,
+#         scl=Pin(PIN["dist_clock"]),
+#         sda=Pin(PIN["dist_data"]),
+#         freq=100_000,
+#     ),
+# )
 ldr_1: ADC = ADC(Pin(PIN["ldr_1"]))
 ldr_2: ADC = ADC(Pin(PIN["ldr_2"]))
-pressure: ADC = ADC(Pin(PIN["pressure"]))
+# pressure: ADC = ADC(Pin(PIN["pressure"]))
 
-for sensor in (ldr_1, ldr_2, pressure):
+for sensor in (ldr_1, ldr_2):
     sensor.atten(ADC.ATTN_11DB)
 
 
@@ -68,44 +68,44 @@ def toggle_uv_led() -> None:
     uv_led.value(not uv_led.value())
 
 
-def _send_color(color: tuple[int, int, int]) -> None:
-    rgb_led[0] = color
-    rgb_led.write()
+# def _send_color(color: tuple[int, int, int]) -> None:
+#     rgb_led[0] = color
+#     rgb_led.write()
 
 
-def _disable_rgb_led() -> None:
-    _send_color(COLOR["off"])
+# def _disable_rgb_led() -> None:
+#     _send_color(COLOR["off"])
 
 
-def set_rgb_led(
-    color: tuple[int, int, int],
-    seconds: float = 0,
-    pulse: int = 0,
-) -> None:
-    """*Set ESP32 RGB LED to a certain color*.
+# def set_rgb_led(
+#     color: tuple[int, int, int],
+#     seconds: float = 0,
+#     pulse: int = 0,
+# ) -> None:
+#     """*Set ESP32 RGB LED to a certain color*.
 
-    Args:
-        color (tuple[int, int, int]): *Specified color*
-        seconds (float, optional): *Turn off after waiting*. Defaults to 0.
-        pulse (int, optional): *# of pulses*. Defaults to 0.
+#     Args:
+#         color (tuple[int, int, int]): *Specified color*
+#         seconds (float, optional): *Turn off after waiting*. Defaults to 0.
+#         pulse (int, optional): *# of pulses*. Defaults to 0.
 
-    """
-    if rgb_led[0] != COLOR["off"]:
-        _disable_rgb_led()
-    if not seconds:
-        _send_color(color)
-    elif not pulse:
-        time.sleep(seconds)
-        _disable_rgb_led()
-    for _ in range(pulse):
-        _send_color(color)
-        time.sleep(seconds)
-        _disable_rgb_led()
-        time.sleep(seconds)
+#     """
+#     if rgb_led[0] != COLOR["off"]:
+#         _disable_rgb_led()
+#     if not seconds:
+#         _send_color(color)
+#     elif not pulse:
+#         time.sleep(seconds)
+#         _disable_rgb_led()
+#     for _ in range(pulse):
+#         _send_color(color)
+#         time.sleep(seconds)
+#         _disable_rgb_led()
+#         time.sleep(seconds)
 
 
-def read_distance_sensor() -> int:
-    return distance.read_range_single_millimeters()
+# def read_distance_sensor() -> int:
+#     return distance.read_range_single_millimeters()
 
 
 def _print_ellipsis() -> None:
@@ -136,12 +136,12 @@ def connect_wifi(ssid: str, password: str) -> None:
     wlan.active(WIFI["on"])
     time.sleep(0.1)
     print("Connecting to Wi-Fi", end="")
-    wait_display()
-    set_rgb_led(COLOR["red"], seconds=2.0)
+    # set_rgb_led(COLOR["red"], seconds=2.0)
     wlan.connect(ssid, password)
+    wait_display()
     time.sleep(1)
     print("\nConnected to Wi-Fi! IP:", wlan.ifconfig()[0])
-    set_rgb_led(COLOR["green"], seconds=2.0)
+    # set_rgb_led(COLOR["green"], seconds=2.0)
 
 
 def disconnect_wifi() -> None:
@@ -150,7 +150,7 @@ def disconnect_wifi() -> None:
     if wlan.isconnected():
         print("Disconnecting from Wi-Fi", end="")
         wait_display()
-        set_rgb_led(COLOR["red"], seconds=0.1, pulse=5)
+        # set_rgb_led(COLOR["red"], seconds=0.1, pulse=5)
         wlan.disconnect()
         wlan.active(WIFI["off"])
         print("\nDisconnected from Wi-Fi!")
@@ -166,7 +166,6 @@ def msg_to_cmd(topic: bytes, msg: bytes) -> None:
         msg (bytes): *Topic message*
 
     """
-    print(f"Website Message: {msg.decode()}")
     if msg == b"toggle":
         toggle_uv_led()
 
@@ -181,11 +180,12 @@ def main() -> None:
     wait_display()
     print("\nConnected to MQTT broker!")
     client.set_callback(msg_to_cmd)
-    client.connect()
-    client.subscribe(MQTT["topic"])
     print(f"Subscribing to {MQTT['topic']}", end="")
+    client.connect()
     wait_display()
+    client.subscribe(MQTT["topic"])
     print(f"\nSubscribed to {MQTT['topic']}!")
+    time.sleep(1)
 
     try:
         sys.stdout.write(CLEAR_TERMINAL)
@@ -193,15 +193,19 @@ def main() -> None:
             client.check_msg()
             time.sleep(0.1)
             sys.stdout.write("\033[H")
-            sys.stdout.write(f"Distance: {read_distance_sensor():<10} mm\n")
+            # sys.stdout.write(f"Distance: {read_distance_sensor():<10} mm\n")
             sys.stdout.write(f"LDR 1: {ldr_1.read():<10} ohms\n")
             sys.stdout.write(f"LDR 2: {ldr_2.read():<10} ohms\n")
-            sys.stdout.write(f"Pressure Resistance: {ldr_2.read():<10} ohms\n")
+            # sys.stdout.write(f"Pressure Resistance: {pressure.read():<10} ohms\n")
+            sys.stdout.write(f"LED Indicator: {uv_led.value():<10}\n")
             time.sleep(0.2)
     except KeyboardInterrupt:
         sys.exit()
     except OSError as e:
         sys.exit(e)
+    finally:
+        client.disconnect()
+        disconnect_wifi()
 
 
 if __name__ == "__main__":

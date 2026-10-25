@@ -13,14 +13,16 @@
 
     <div class="ring-item">
       <div class="progress-ring battery-ring" data-topic="bottle/battery" style="--pct: 0;">
-        <button class="round-button percentage" onclick="sendMQTT('Percentage')">Battery</button></div>
+        <button class="round-button percentage" onclick="sendMQTT('Percentage')">Battery</button>
+      </div>
 
     </div>
-    
+
     <div class="ring-item">
       <div class="progress-ring hydration-ring" data-topic="bottle/hydration" style="--pct: 0;">
-        <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button></div>
-  
+        <button class="round-button hydration" onclick="sendMQTT('Hydration')">Hydration</button>
+      </div>
+
     </div>
 
   </div>
@@ -40,7 +42,7 @@
       <span id="rgb-preview" class="rgb-preview"></span>
     </div>
 
-    <button class="round-button mode" id="mode-button">Off</button>
+    <button class="round-button" id="mode-button" onclick="sendMQTT('toggle')">Off</button>
   </div>
 
   <script src="RGB-slider.js"></script>
