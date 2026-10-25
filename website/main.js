@@ -24,8 +24,6 @@ function setRing(ring, value) {
   ring.style.setProperty("--fill", color);
 }
 
-// Connect (delete this line if you already create `client` elsewhere)
-const client = mqtt.connect("wss://YOUR_BROKER_URL:PORT/mqtt");
 
 client.on("connect", () => {
   document.getElementById("status").textContent = "Connected";
