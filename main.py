@@ -5,37 +5,76 @@ import sys
 import time
 
 import network
-from machine import Pin
+from machine import ADC, I2C, Pin
 from neopixel import NeoPixel
 from umqtt.simple import MQTTClient
+from vl53l0x import VL53L0X
 
-R2_SSID: str = "Adams County Mosque"
-R2_KEY: str = "allahuakbar777"
+CLEAR_TERMINAL: str = "\033[2J\033[H"
 
-MQTT_CLIENT_ID: str = "esp32s3_client_hackohio2026"
-MQTT_SERVER: str = "broker.hivemq.com"
-MQTT_TOPIC: str = "myhome/esp32s3/led"
+HOTSPOT: dict[str, str] = {
+    "ssid": "iPhone (2)",
+    "key": "SurIsTheBest",
+}
 
-WIFI_ON: bool = True
-WIFI_OFF: bool = False
+MQTT: dict[str, str] = {
+    "client_id": "esp32s3_client_hackohio2026",
+    "server": "broker.hivemq.com",
+    "topic": "myhome/esp32s3/led",
+}
 
-RGB_OFF: tuple[int, int, int] = (0, 0, 0)
-RED: tuple[int, int, int] = (255, 0, 0)
-GREEN: tuple[int, int, int] = (0, 255, 0)
-PURPLE: tuple[int, int, int] = (255, 0, 255)
+WIFI: dict[str, bool] = {
+    "on": True,
+    "off": False,
+}
 
-rgb_led: NeoPixel = NeoPixel(Pin(48), 1)
-uv_led: Pin = Pin(6, Pin.OUT)
+COLOR: dict[str, tuple[int, int, int]] = {
+    "off": (0, 0, 0),
+    "red": (255, 0, 0),
+    "green": (0, 255, 0),
+}
+
+PIN: dict[str, int] = {
+    "rgb": 48,
+    "uv": 6,
+    "dist_clock": 9,
+    "dist_data": 8,
+    "ldr_1": 4,
+    "ldr_2": 5,
+    "pressure": 1,
+}
 
 
-def toggle_pin(pin: Pin) -> None:
-    """*Toggle specific pin on ESP32*.
+rgb_led: NeoPixel = NeoPixel(Pin(PIN["rgb"]), 1)
+uv_led: Pin = Pin(PIN["uv"], mode=Pin.OUT)
+distance: VL53L0X = VL53L0X(
+    I2C(
+        0,
+        scl=Pin(PIN["dist_clock"]),
+        sda=Pin(PIN["dist_data"]),
+        freq=100_000,
+    ),
+)
+ldr_1: ADC = ADC(Pin(PIN["ldr_1"]))
+ldr_2: ADC = ADC(Pin(PIN["ldr_2"]))
+pressure: ADC = ADC(Pin(PIN["pressure"]))
 
-    Args:
-        pin (Pin): *Numbered pin*
+for sensor in (ldr_1, ldr_2, pressure):
+    sensor.atten(ADC.ATTN_11DB)
 
-    """
-    pin.value(not pin.value())
+
+def toggle_uv_led() -> None:
+    """*Toggle UV LED*."""
+    uv_led.value(not uv_led.value())
+
+
+def _send_color(color: tuple[int, int, int]) -> None:
+    rgb_led[0] = color
+    rgb_led.write()
+
+
+def _disable_rgb_led() -> None:
+    _send_color(COLOR["off"])
 
 
 def set_rgb_led(
@@ -51,23 +90,36 @@ def set_rgb_led(
         pulse (int, optional): *# of pulses*. Defaults to 0.
 
     """
-    if rgb_led[0] != RGB_OFF:
-        rgb_led[0] = RGB_OFF
-        rgb_led.write()
+    if rgb_led[0] != COLOR["off"]:
+        _disable_rgb_led()
     if not seconds:
-        rgb_led[0] = color
-        rgb_led.write()
+        _send_color(color)
     elif not pulse:
         time.sleep(seconds)
-        rgb_led[0] = RGB_OFF
-        rgb_led.write()
+        _disable_rgb_led()
     for _ in range(pulse):
-        rgb_led[0] = color
-        rgb_led.write()
+        _send_color(color)
         time.sleep(seconds)
-        rgb_led[0] = RGB_OFF
-        rgb_led.write()
+        _disable_rgb_led()
         time.sleep(seconds)
+
+
+def read_distance_sensor() -> int:
+    return distance.read_range_single_millimeters()
+
+
+def _print_ellipsis() -> None:
+    for _ in range(3):
+        print(".", end="")
+        time.sleep(0.15)
+
+
+def wait_display() -> None:
+    """*Show "loading" ellipsis*."""
+    for _ in range(3):
+        _print_ellipsis()
+        sys.stdout.write("\b\b\b   \b\b\b")
+    _print_ellipsis()
 
 
 def connect_wifi(ssid: str, password: str) -> None:
@@ -79,27 +131,29 @@ def connect_wifi(ssid: str, password: str) -> None:
 
     """
     wlan: network.WLAN = network.WLAN(network.STA_IF)
-    wlan.active(WIFI_OFF)
+    wlan.active(WIFI["off"])
     time.sleep(0.1)
-    wlan.active(WIFI_ON)
+    wlan.active(WIFI["on"])
     time.sleep(0.1)
-    print("Connecting...")
-    set_rgb_led(RED, seconds=2.0)
+    print("Connecting to Wi-Fi", end="")
+    wait_display()
+    set_rgb_led(COLOR["red"], seconds=2.0)
     wlan.connect(ssid, password)
     time.sleep(1)
-    print("Connected! IP:", wlan.ifconfig()[0])
-    set_rgb_led(GREEN, seconds=2.0)
+    print("\nConnected to Wi-Fi! IP:", wlan.ifconfig()[0])
+    set_rgb_led(COLOR["green"], seconds=2.0)
 
 
 def disconnect_wifi() -> None:
     """*Disconnect ESP32 from current Wi-Fi network*."""
     wlan: network.WLAN = network.WLAN(network.STA_IF)
     if wlan.isconnected():
-        print("Disconnecting...")
-        set_rgb_led(RED, seconds=0.1, pulse=5)
+        print("Disconnecting from Wi-Fi", end="")
+        wait_display()
+        set_rgb_led(COLOR["red"], seconds=0.1, pulse=5)
         wlan.disconnect()
-        wlan.active(WIFI_OFF)
-        print("Disconnected!")
+        wlan.active(WIFI["off"])
+        print("\nDisconnected from Wi-Fi!")
     else:
         print("Wi-Fi was not connected.")
 
@@ -112,38 +166,42 @@ def msg_to_cmd(topic: bytes, msg: bytes) -> None:
         msg (bytes): *Topic message*
 
     """
-    print(f"Received message on {topic.decode()}: {msg.decode()}")
-    if msg == b"ON":
-        uv_led.on()
-        print("LED: On")
-    elif msg == b"OFF":
-        uv_led.off()
-        print("LED: Off")
-    elif msg == b"filler":
-        toggle_pin(uv_led)
+    print(f"Website Message: {msg.decode()}")
+    if msg == b"toggle":
+        toggle_uv_led()
 
 
 def main() -> None:
     """*Control ESP32*."""
     uv_led.off()
-    connect_wifi(R2_SSID, R2_KEY)
+    connect_wifi(HOTSPOT["ssid"], HOTSPOT["key"])
 
-    client: MQTTClient = MQTTClient(MQTT_CLIENT_ID, MQTT_SERVER)
+    client: MQTTClient = MQTTClient(MQTT["client_id"], MQTT["server"])
+    print("Connecting to MQTT broker", end="")
+    wait_display()
+    print("\nConnected to MQTT broker!")
     client.set_callback(msg_to_cmd)
     client.connect()
-    client.subscribe(MQTT_TOPIC)
-    print(f"Connected to MQTT broker and subscribed to {MQTT_TOPIC}")
+    client.subscribe(MQTT["topic"])
+    print(f"Subscribing to {MQTT['topic']}", end="")
+    wait_display()
+    print(f"\nSubscribed to {MQTT['topic']}!")
 
     try:
+        sys.stdout.write(CLEAR_TERMINAL)
         while True:
             client.check_msg()
             time.sleep(0.1)
+            sys.stdout.write("\033[H")
+            sys.stdout.write(f"Distance: {read_distance_sensor():<10} mm\n")
+            sys.stdout.write(f"LDR 1: {ldr_1.read():<10} ohms\n")
+            sys.stdout.write(f"LDR 2: {ldr_2.read():<10} ohms\n")
+            sys.stdout.write(f"Pressure Resistance: {ldr_2.read():<10} ohms\n")
+            time.sleep(0.2)
     except KeyboardInterrupt:
-        client.disconnect()
+        sys.exit()
     except OSError as e:
         sys.exit(e)
-    finally:
-        disconnect_wifi()
 
 
 if __name__ == "__main__":
