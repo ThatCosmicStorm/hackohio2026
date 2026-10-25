@@ -1,7 +1,8 @@
 # ruff: ignore[CPY001]
 """*Main Python script*."""
 
-from time import sleep
+import sys
+import time
 
 import network
 from machine import Pin
@@ -24,7 +25,7 @@ GREEN: tuple[int, int, int] = (0, 255, 0)
 PURPLE: tuple[int, int, int] = (255, 0, 255)
 
 rgb_led: NeoPixel = NeoPixel(Pin(48), 1)
-uv_led: Pin = Pin(5, Pin.OUT)
+uv_led: Pin = Pin(6, Pin.OUT)
 
 
 def toggle_pin(pin: Pin) -> None:
@@ -50,22 +51,23 @@ def set_rgb_led(
         pulse (int, optional): *# of pulses*. Defaults to 0.
 
     """
-    rgb_led[0] = RGB_OFF
-    rgb_led.write()
+    if rgb_led[0] != RGB_OFF:
+        rgb_led[0] = RGB_OFF
+        rgb_led.write()
     if not seconds:
         rgb_led[0] = color
         rgb_led.write()
     elif not pulse:
-        sleep(seconds)
+        time.sleep(seconds)
         rgb_led[0] = RGB_OFF
         rgb_led.write()
     for _ in range(pulse):
         rgb_led[0] = color
         rgb_led.write()
-        sleep(seconds)
+        time.sleep(seconds)
         rgb_led[0] = RGB_OFF
         rgb_led.write()
-        sleep(seconds)
+        time.sleep(seconds)
 
 
 def connect_wifi(ssid: str, password: str) -> None:
@@ -78,13 +80,13 @@ def connect_wifi(ssid: str, password: str) -> None:
     """
     wlan: network.WLAN = network.WLAN(network.STA_IF)
     wlan.active(WIFI_OFF)
-    sleep(0.1)
+    time.sleep(0.1)
     wlan.active(WIFI_ON)
-    sleep(0.1)
+    time.sleep(0.1)
     print("Connecting...")
     set_rgb_led(RED, seconds=2.0)
     wlan.connect(ssid, password)
-    sleep(1)
+    time.sleep(1)
     print("Connected! IP:", wlan.ifconfig()[0])
     set_rgb_led(GREEN, seconds=2.0)
 
@@ -135,15 +137,14 @@ def main() -> None:
     try:
         while True:
             client.check_msg()
-            sleep(0.1)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         client.disconnect()
+    except OSError as e:
+        sys.exit(e)
     finally:
         disconnect_wifi()
 
 
 if __name__ == "__main__":
     main()
-
-
-
