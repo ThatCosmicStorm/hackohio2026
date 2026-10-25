@@ -57,9 +57,9 @@ uv_led: Pin = Pin(PIN["uv"], Pin.OUT)
 # )
 ldr_1: ADC = ADC(Pin(PIN["ldr_1"]))
 ldr_2: ADC = ADC(Pin(PIN["ldr_2"]))
-# pressure: ADC = ADC(Pin(PIN["pressure"]))
+pressure: ADC = ADC(Pin(PIN["pressure"]))
 
-for sensor in (ldr_1, ldr_2):
+for sensor in (ldr_1, ldr_2, pressure):
     sensor.atten(ADC.ATTN_11DB)
 
 
@@ -183,9 +183,10 @@ def main() -> None:
     print(f"Subscribing to {MQTT['topic']}", end="")
     client.connect()
     wait_display()
+    time.sleep(1)
     client.subscribe(MQTT["topic"])
     print(f"\nSubscribed to {MQTT['topic']}!")
-    time.sleep(1)
+    time.sleep(2)
 
     try:
         sys.stdout.write(CLEAR_TERMINAL)
@@ -194,10 +195,12 @@ def main() -> None:
             time.sleep(0.1)
             sys.stdout.write("\033[H")
             # sys.stdout.write(f"Distance: {read_distance_sensor():<10} mm\n")
-            sys.stdout.write(f"LDR 1: {ldr_1.read():<10} ohms\n")
-            sys.stdout.write(f"LDR 2: {ldr_2.read():<10} ohms\n")
-            # sys.stdout.write(f"Pressure Resistance: {pressure.read():<10} ohms\n")
-            sys.stdout.write(f"LED Indicator: {uv_led.value():<10}\n")
+            sys.stdout.write(f"LDR 1: {ldr_1.read():<4} ohms\n")
+            sys.stdout.write(f"LDR 2: {ldr_2.read():<4} ohms\n")
+            sys.stdout.write(
+                f"Pressure Resistance: {pressure.read():<4} ohms\n",
+            )
+            sys.stdout.write(f"LED Indicator: {uv_led.value():<1}\n")
             time.sleep(0.2)
     except KeyboardInterrupt:
         sys.exit()
