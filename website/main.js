@@ -39,3 +39,39 @@ client.on("message", (topic, message) => {
 function sendMQTT(msg) {
   client.publish("bottle/command", msg);
 }
+
+
+
+// ---- Mode button ----
+const modes = [
+  { label: "Off", value: "mode1" },
+  { label: "Low", value: "mode2" },
+  { label: "Medium", value: "mode3" },
+  { label: "High", value: "mode4" }
+];
+let modeIndex = 0;
+
+const modeButton = document.getElementById("mode-button");
+
+function showMode(i) {
+  modeIndex = i % modes.length;
+  modeButton.textContent = modes[modeIndex].label;
+}
+
+modeButton.addEventListener("click", () => {
+  showMode(modeIndex + 1);                                   // next mode, wraps to the first
+  client.publish("bottle/mode", modes[modeIndex].value, { retain: true });
+});
+
+showMode(0);
+
+client.on("connect", () => {
+  client.subscribe("bottle/mode");
+});
+
+client.on("message", (topic, message) => {
+  if (topic === "bottle/mode") {
+    const i = modes.findIndex(m => m.value === message.toString());
+    if (i !== -1) showMode(i);
+  }
+});

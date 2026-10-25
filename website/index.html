@@ -28,7 +28,7 @@
   <div>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-    <model-viewer center src="Bottle5.glb" alt="3D model of the bottle" camera-controls auto-rotate shadow-intensity="1"
+    <model-viewer center src="Bottle.glb" alt="3D model of the bottle" camera-controls auto-rotate shadow-intensity="1"
       style="width: 350px; height: 350px;">
     </model-viewer>
   </div>
@@ -40,7 +40,7 @@
       <span id="rgb-preview" class="rgb-preview"></span>
     </div>
 
-    <button class="round-button mode" onclick="sendMQTT('filler')">mode</button>
+    <button class="round-button mode" id="mode-button">Off</button>
   </div>
 
   <script src="RGB-slider.js"></script>
